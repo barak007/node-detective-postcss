@@ -1,11 +1,14 @@
 import * as d from 'debug';
-import { parse, AtRule } from 'postcss';
+import { parse, AtRule, Rule } from 'postcss';
 import * as postCssValuesParser from 'postcss-values-parser';
 import isUrl = require('is-url');
 
 const debug = d('detective-postcss');
 
-function detective(src, options: detective.Options = { url: false }) {
+function detective(
+    src,
+    options: detective.Options = { url: false, stylable: false }
+) {
     let references = [];
     let root;
     try {
@@ -51,7 +54,27 @@ function detective(src, options: detective.Options = { url: false }) {
             }
         });
     }
+    if (options.stylable) {
+        root.walkRules(rule => {
+            if (rule.selector === ':import') {
+                const file = getFromValue(rule);
+                if (file) {
+                    debug(`found %s of %s`, 'Stylable :import', file);
+                    references.push(file);
+                }
+            }
+        });
+    }
     return references;
+}
+
+function getFromValue(rule: Rule): string | undefined {
+    let lastFrom;
+    rule.walkDecls(/-st-from/, decl => (lastFrom = decl));
+    if (lastFrom) {
+        const match = lastFrom.value.match(/^("|')(.*?)("|')$/);
+        return match && match[2];
+    }
 }
 
 function parseValue(value: string) {
@@ -88,7 +111,8 @@ function isFrom(node: postCssValuesParser.Node) {
 
 namespace detective {
     export interface Options {
-        url: boolean;
+        url?: boolean;
+        stylable?: boolean;
     }
 
     export class MalformedCssError {}

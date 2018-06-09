@@ -23,6 +23,9 @@ const dependencies = detective(content);
 
 // or to also detect any url() references to images, fonts, etc.
 const allDependencies = detective(content, { url: true });
+
+// detect stylable imports.
+const allDependencies = detective(content, { url: true, stylable: true });
 ```
 
 ### License

@@ -58,6 +58,22 @@ describe('node-detective-postcss', () => {
         });
     });
 
+    describe('stylable imports', () => {
+        it('find stylable :import', () => {
+            assert(':import {-st-from: "foo.st.css"}', ['foo.st.css'], {
+                stylable: true,
+            });
+        });
+
+        it('find multiple :import', () => {
+            assert(
+                ':import {-st-from: "1.st.css"} :import {-st-from: \'2.st.css\'}',
+                ['1.st.css', '2.st.css'],
+                { stylable: true }
+            );
+        });
+    });
+
     describe('@value', () => {
         // see https://github.com/css-modules/postcss-icss-values
         it('extracts from single values', () => {
