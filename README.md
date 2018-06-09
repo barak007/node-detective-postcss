@@ -25,7 +25,7 @@ const dependencies = detective(content);
 const allDependencies = detective(content, { url: true });
 
 // detect stylable imports.
-const allDependencies = detective(content, { url: true, stylable: true });
+const allDependencies = detective(content, { stylable: true });
 ```
 
 ### License
